@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: white;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 40px 30px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+
+        .domain {
+            font-weight: 500;
+            color: #0070f3;
+            word-break: break-all;
+        }
+
+        .message {
+            font-size: 18px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        .countdown {
+            font-size: 16px;
+            margin: 20px 0;
+            color: #666;
+        }
+
+        .time {
+            font-weight: bold;
+            color: #0070f3;
+        }
+
+        .direct-link {
+            margin-top: 25px;
+        }
+
+        .direct-link a {
+            display: inline-block;
+            color: #0070f3;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 20px;
+            border: 1px solid #0070f3;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .direct-link a:hover {
+            background-color: #0070f3;
+            color: white;
+        }
+
+        .error {
+            color: #e53e3e;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fff5f5;
+            border-radius: 8px;
+            border-left: 4px solid #e53e3e;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .message {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="redirect-container">
+        <h1>Redirecting to <span class="domain" id="domain-display">...</span></h1>
+        <div class="message" id="message-display">Wait while we redirecting you...</div>
+        <div class="countdown">Redirecting in <span class="time" id="countdown">5</span> seconds</div>
+        <div class="direct-link">
+            <a href="#" id="direct-link">Go to destination now</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener( 'DOMContentLoaded', function ()
+        {
+            const urlParams = new URLSearchParams( window.location.search )
+            const redirectTo = urlParams.get( 'redirect_to' )
+            const message = urlParams.get( 'message' ) || 'Redirecting you to the destination...'
+            let timeToRedirect = urlParams.get( 'time_to_redirect' )
+
+            timeToRedirect = parseInt( timeToRedirect ) || 5
+
+            const domainDisplay = document.getElementById( 'domain-display' )
+            const messageDisplay = document.getElementById( 'message-display' )
+            const countdownElement = document.getElementById( 'countdown' )
+            const directLink = document.getElementById( 'direct-link' )
+            const container = document.getElementById( 'redirect-container' )
+
+            if ( !redirectTo )
+            {
+                container.innerHTML = `
+                    <div class="error">
+                        <h1>Missing Redirect URL</h1>
+                        <p>The redirect_to parameter is required.</p>
+                    </div>
+                `
+                return
+            }
+
+            let domain
+            try
+            {
+                domain = new URL( redirectTo ).hostname
+            } catch ( e )
+            {
+                domain = redirectTo
+            }
+
+            domainDisplay.textContent = domain
+            messageDisplay.textContent = message
+            countdownElement.textContent = timeToRedirect
+            directLink.href = redirectTo
+
+            let secondsLeft = timeToRedirect
+            const countdownInterval = setInterval( () =>
+            {
+                secondsLeft--
+                countdownElement.textContent = secondsLeft
+
+                if ( secondsLeft <= 0 )
+                {
+                    clearInterval( countdownInterval )
+                    window.location.href = redirectTo
+                }
+            }, 1000 )
+
+            directLink.textContent = `Go to ${ domain } now`
+        } );
+    </script>
+</body>
+
+</html>
